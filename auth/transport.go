@@ -1,22 +1,13 @@
 package auth
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/transport"
 	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
-	"io/ioutil"
 	"net/http"
-)
-
-var (
-	// ErrBadRouting is returned when an expected path variable is missing.
-	// It always indicates programmer error.
-	ErrBadRouting = errors.New("inconsistent mapping between route and handler (programmer error)")
 )
 
 // MakeHTTPHandler mounts all of the service endpoints into an http.Handler.
@@ -59,16 +50,6 @@ func encodeResponse(ctx context.Context, w http.ResponseWriter, response interfa
 	}
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	return json.NewEncoder(w).Encode(response)
-}
-
-func encodeRequest(_ context.Context, req *http.Request, request interface{}) error {
-	var buf bytes.Buffer
-	err := json.NewEncoder(&buf).Encode(request)
-	if err != nil {
-		return err
-	}
-	req.Body = ioutil.NopCloser(&buf)
-	return nil
 }
 
 func encodeError(_ context.Context, err error, w http.ResponseWriter) {
