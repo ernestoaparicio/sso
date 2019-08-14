@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/ernestoaparicio/sso/pkg/ldap"
+	"log"
 	"os"
 	"strconv"
 	"sync"
@@ -57,13 +58,14 @@ func (s *service) Authenticate(ctx context.Context, u User) (Token, error) {
 		return Token{}, err
 	}
 
-	fmt.Printf("checkpoint a, user %v", u)
-
 	// Validate username/password against AD
 	user, err := ldap.AuthenticateLDAP(u.MSID, u.Password)
 	if err != nil {
+		log.Fatal("Error calling AuthenticateLDAP: %v", err)
 		return Token{}, err
 	}
+
+	fmt.Printf("authenticated user: %v", *user)
 
 	// todo implement reducer of memberOf array
 	// Reduce memberOf
